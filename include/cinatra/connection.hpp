@@ -65,7 +65,7 @@ namespace cinatra {
             }
             catch (const std::exception& e) {
                 std::cout << e.what() << "\n";
-            }            
+            }
 #endif
         }
 
@@ -320,7 +320,7 @@ namespace cinatra {
         }
 
 		void async_handshake() {
-#ifdef CINATRA_ENABLE_SSL            
+#ifdef CINATRA_ENABLE_SSL
 			ssl_stream_->async_handshake(boost::asio::ssl::stream_base::server,
 				[this, self = this->shared_from_this()](const boost::system::error_code& error) {
 				if (error) {
@@ -364,14 +364,14 @@ namespace cinatra {
 			auto last_len = req_.current_size();
 			last_transfer_ = last_len;
 			bool at_capacity = req_.update_and_expand_size(bytes_transferred);
-			if (at_capacity) { 
+			if (at_capacity) {
 				response_back(status_type::bad_request, "The request is too long, limitation is 3M");
 				return;
 			}
 
 			int ret = req_.parse_header(len_);
 
-			if (ret == parse_status::has_error) { 
+			if (ret == parse_status::has_error) {
 				response_back(status_type::bad_request);
 				return;
 			}
@@ -453,7 +453,7 @@ namespace cinatra {
 				len_ = ret;
 			else
 				len_ += ret;
-			
+
 			auto& rep_str = res_.response_str();
 			int result = 0;
             size_t left = ret;
@@ -472,14 +472,14 @@ namespace cinatra {
 					head_not_complete = true;
 					break;
 				}
-				
+
 				//index++;
 				auto total_len = req_.total_len();
 
 				if (total_len <= (bytes_transferred - len_)) {
 					req_.set_last_len(len_);
 					handle_request(bytes_transferred);
-				}				
+				}
 
 				len_ += total_len;
 
@@ -556,7 +556,7 @@ namespace cinatra {
 
 		void do_write() {
 			reset_timer();
-			
+
 			std::string& rep_str = res_.response_str();
 			if (rep_str.empty()) {
 				handle_write(boost::system::error_code{});
@@ -568,7 +568,7 @@ namespace cinatra {
 //				auto raw_url = req_.raw_url();
 //				http_cache::get().add(std::string(raw_url.data(), raw_url.length()), res_.raw_content());
 //			}
-			
+
 			boost::asio::async_write(socket(), boost::asio::buffer(rep_str.data(), rep_str.size()),
 				[this, self = this->shared_from_this()](const boost::system::error_code& ec, std::size_t bytes_transferred) {
 				handle_write(ec);
@@ -796,7 +796,7 @@ namespace cinatra {
 						req_.set_state(data_proc_state::data_error);
 						res_.set_status_and_content(status_type::bad_request, "mutipart error");
 						return;
-					}						
+					}
 					if(is_multi_part_file_)
 					{
 						auto ext = get_extension(filename);
@@ -808,14 +808,14 @@ namespace cinatra {
 							if (multipart_begin_) {
 								multipart_begin_(req_, name);
 							}
-							
+
 							req_.open_upload_file(name);
 						}
 						catch (const std::exception& ex) {
 							req_.set_state(data_proc_state::data_error);
 							res_.set_status_and_content(status_type::internal_server_error, ex.what());
 							return;
-						}						
+						}
 					}else{
 						auto key = req_.get_multipart_field_name("name");
 						req_.save_multipart_key_value(std::string(key.data(),key.size()),"");
@@ -844,7 +844,7 @@ namespace cinatra {
 							auto pos = old_name.rfind("_ing");
 							if (pos != std::string::npos) {
 								pfile->rename_file(old_name.substr(0, old_name.length() - 4));
-							}							
+							}
 						}
 					}
 				};
@@ -852,8 +852,8 @@ namespace cinatra {
 					if (req_.get_state() == data_proc_state::data_error)
 						return;
                     req_.handle_multipart_key_value();
-					//call_back(); 
-				};		
+					//call_back();
+				};
 		}
 
 		bool parse_multipart(size_t size, std::size_t length) {
@@ -886,7 +886,7 @@ namespace cinatra {
 				if (!r) {
 					close();
 					return;
-				}					
+				}
 			}
 
 			bool has_error = parse_multipart(req_.header_len(), req_.current_size() - req_.header_len());
@@ -1114,7 +1114,7 @@ namespace cinatra {
 				reset_timer();
                 std::string temp;
                 if (!last_ws_str_.empty()) {
-                    temp = std::move(last_ws_str_);                    
+                    temp = std::move(last_ws_str_);
                 }
                 temp.append(std::move(payload));
 				req_.set_part_data(temp);
@@ -1255,7 +1255,7 @@ namespace cinatra {
 		}
 
 		void shutdown() {
-			boost::system::error_code ignored_ec; 
+			boost::system::error_code ignored_ec;
             socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
 		}
 
